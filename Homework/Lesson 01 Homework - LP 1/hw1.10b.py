@@ -20,12 +20,12 @@ model.x = Var( ['x1m','x1t','x1w','x1r','x1f',
 print(model.x)
 
 # Objective
-model.obj = Objective( expr = 25 * 8 * (model.x['x1m'] + model.x['x1t'] + model.x['x1w']+ model.x['x1r']+ model.x['x1f']) +
-                      26 * 8 * (model.x['x2m'] + model.x['x2t'] + model.x['x2w']+ model.x['x2r']+ model.x['x2f']) +
-                      24 * 8 * (model.x['x3m'] + model.x['x3t'] + model.x['x3w']+ model.x['x3r']+ model.x['x3f']) +
-                      23 * 8 * (model.x['x4m'] + model.x['x4t'] + model.x['x4w']+ model.x['x4r']+ model.x['x4f']) +
-                      28 * 8 * (model.x['x5m'] + model.x['x5t'] + model.x['x5w']+ model.x['x5r']+ model.x['x5f']) +
-                      30 * 8 * (model.x['x6m'] + model.x['x6t'] + model.x['x6w']+ model.x['x6r']+ model.x['x6f'])
+model.obj = Objective( expr = 25 * (model.x['x1m'] + model.x['x1t'] + model.x['x1w']+ model.x['x1r']+ model.x['x1f']) +
+                      26 * (model.x['x2m'] + model.x['x2t'] + model.x['x2w']+ model.x['x2r']+ model.x['x2f']) +
+                      24 * (model.x['x3m'] + model.x['x3t'] + model.x['x3w']+ model.x['x3r']+ model.x['x3f']) +
+                      23  * (model.x['x4m'] + model.x['x4t'] + model.x['x4w']+ model.x['x4r']+ model.x['x4f']) +
+                      28  * (model.x['x5m'] + model.x['x5t'] + model.x['x5w']+ model.x['x5r']+ model.x['x5f']) +
+                      30  * (model.x['x6m'] + model.x['x6t'] + model.x['x6w']+ model.x['x6r']+ model.x['x6f'])
                 , sense = minimize)
 
 # # Constraints
@@ -86,14 +86,15 @@ solver = SolverFactory('glpk')
 solver.solve(model)
 
 # remove the comment symbol to see the pyomo display of results
-display(model)
+# display(model)
 
-# # print a shorter summary of relevant results
-# print(f"Total Cost = ${model.obj():,.2f}")
-# print(f"Number of FT, 8 am - 4 pm: {model.x['xf1']():.0f}")
-# print(f"Number of FT, noon - 8 pm: {model.x['xf2']():.0f}")
-# print(f"Number of FT, 4 pm -12 am: {model.x['xf3']():.0f}")
-# print(f"Number of PT, 8 am -12 pm: {model.x['xp1']():.0f}")
-# print(f"Number of PT, noon - 4 pm: {model.x['xp2']():.0f}")
-# print(f"Number of PT, 4 pm - 8 pm: {model.x['xp3']():.0f}")
-# print(f"Number of PT, 8 pm -12 am: {model.x['xp4']():.0f}")
+print(model.obj()) # added by Dr. B.
+
+print(f"Person: Hours")
+print(f"Hours in format (m, t, w, r, f)")
+print(f"K.C.:({model.x['x1m']()}, {model.x['x1t']()}, {model.x['x1w']()}, {model.x['x1r']()}, {model.x['x1f']()} )")
+print(f"D.H.:({model.x['x2m']()}, {model.x['x2t']()}, {model.x['x2w']()}, {model.x['x2r']()}, {model.x['x2f']()} )")
+print(f"H.B.:({model.x['x3m']()}, {model.x['x3t']()}, {model.x['x3w']()}, {model.x['x3r']()}, {model.x['x3f']()} )")
+print(f"S.C.:({model.x['x4m']()}, {model.x['x4t']()}, {model.x['x4w']()}, {model.x['x4r']()}, {model.x['x4f']()} )")
+print(f"K.S.:({model.x['x5m']()}, {model.x['x5t']()}, {model.x['x5w']()}, {model.x['x5r']()}, {model.x['x5f']()} )")
+print(f"N.K.:({model.x['x6m']()}, {model.x['x6t']()}, {model.x['x6w']()}, {model.x['x6r']()}, {model.x['x6f']()} )")

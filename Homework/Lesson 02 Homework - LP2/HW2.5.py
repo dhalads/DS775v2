@@ -33,12 +33,15 @@ model.weekly_feed = Var(feeds, domain=NonNegativeReals)
 model.cost = Objective(expr=sum(cost_rate[fd] * model.weekly_feed[fd]
                                for fd in feeds),
                       sense=minimize)
+model.cost.pprint()
 
 model.capacity = ConstraintList()
 for dr in dailyReq:
     model.capacity.add(
         sum(nutrients_per_kg[fd][dr] * model.weekly_feed[fd]
             for fd in feeds) >= min_nutrients[dr])
+
+model.capacity.pprint()
 
 # Solve
 solver = SolverFactory('glpk')
