@@ -3,9 +3,6 @@ from openpyxl import load_workbook
 from pyomo.environ import *
 import pandas as pd
 import numpy as np
-import os
-print(os.getcwd())
-
 
 sources = [1, 2, 3]
 markets = [1, 2, 3, 4, 5]
@@ -33,10 +30,10 @@ def run_model(cmod):
     model.num_shipped_per_route = Var(cmod.keys(), domain = NonNegativeReals)
 
     # define objective function
-    model.total_cost = Objective( expr = sum(cmod[s, mk, mode][0]*model.num_shipped_per_route[s, mk, mode] + cmod[s, mk, mode][1]
+    model.total_cost = Objective( expr = sum((cmod[s, mk, mode][0]+ cmod[s, mk, mode][1])*1000*model.num_shipped_per_route[s, mk, mode]
                                              for (s, mk, mode) in cmod.keys() ),
                                 sense = minimize )
-    model.total_cost.pprint()
+    # model.total_cost.pprint()
 
     # define constraints
     model.supply_ct = ConstraintList()
@@ -45,14 +42,14 @@ def run_model(cmod):
         model.supply_ct.add(
             sum(model.num_shipped_per_route[ls, mk, mode] for ls, mk, mode in costs.keys() if s == ls ) == supply_dict[s])
 
-    model.supply_ct.pprint()
+    # model.supply_ct.pprint()
 
     model.demand_ct = ConstraintList()
     for (mk) in demand_dict.keys():
         model.demand_ct.add(
             sum(model.num_shipped_per_route[s, mkl, mode] for s, mkl, mode in costs.keys() if mk == mkl ) == demand_dict[mk])
 
-    model.demand_ct.pprint()
+    # model.demand_ct.pprint()
 
     solver = SolverFactory('glpk')
     solver.solve(model)
@@ -71,22 +68,38 @@ def run_model(cmod):
     return output
 
 def print_output(label, input):
-    print(f"\nTransported Amounts for {label}")
+    print(f"\nTransport used: {label}")
     print(f"Minimum Total Cost = ${input[0]:,.2f}")
 
     print(f"\nTransported Amounts for rail")
     print(input[1])
-    print(f"\nTransported Amounts for ship")
-    print(input[2])
+    if(label != 'rail only'):
+        print(f"\nTransported Amounts for ship")
+        print(input[2])
 
+label = "rail only"
 costs = {}
 add_costs(1, 'rail', [61,72,45,55,66], [0,0,0,0,0] )
 add_costs(2, 'rail', [69,78,60,49,56], [0,0,0,0,0] )
 add_costs(3, 'rail', [59,66,63,61,47], [0,0,0,0,0] )
 
 output = run_model(costs)
-print_output("only rail", output)
+print_output(label, output)
 
+label = "ship unless ship does not delivery then rail"
+costs = {}
+add_costs(1, 'rail', [bigM,bigM,bigM,55,bigM], [0,0,0,0,0] )
+add_costs(2, 'rail', [bigM,bigM,bigM,bigM,bigM], [0,0,0,0,0] )
+add_costs(3, 'rail', [59,bigM,bigM,bigM,bigM], [0,0,0,0,0] )
+
+add_costs(1, 'ship', [31,38,24,bigM,35], np.divide([275,303,238,bigM*10,285],10) )
+add_costs(2, 'ship', [36,43,28,24,31], np.divide([293,318,270,250,265],10) )
+add_costs(3, 'ship', [bigM,33,36,32,26], np.divide([bigM*10,283,275,268,240],10) )
+
+output = run_model(costs)
+print_output(label, output)
+
+label="use both rail and ship"
 costs = {}
 add_costs(1, 'rail', [61,72,45,55,66], [0,0,0,0,0] )
 add_costs(2, 'rail', [69,78,60,49,56], [0,0,0,0,0] )
@@ -97,4 +110,4 @@ add_costs(2, 'ship', [36,43,28,24,31], np.divide([293,318,270,250,265],10) )
 add_costs(3, 'ship', [bigM,33,36,32,26], np.divide([bigM*10,283,275,268,240],10) )
 
 output = run_model(costs)
-print_output("only rail", output)
+print_output(label, output)
