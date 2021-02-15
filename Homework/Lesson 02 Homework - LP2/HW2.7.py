@@ -5,7 +5,7 @@ periods = [
 ]
 shifts = ['s1', 's2', 's3', 's4', 's5']
 daily_cost_per_agent = dict( zip( shifts, [170, 160, 175, 180, 195] ) )
-min_agents_per_period = dict( zip( periods, [48, 79, 65, 87, 64, 73, 82, 43, 52, 15] ) )
+min_agents_per_period = dict( zip( periods, [48, 79, 65, 87, 64, 73, 82, 50, 52, 15] ) )
                             
 pc = [[1, 0, 0, 0, 0], [1, 1, 0, 0, 0], [1, 1, 0, 0, 0], [1, 1, 1, 0, 0],
      [0, 1, 1, 0, 0], [0, 0, 1, 1, 0], [0, 0, 1, 1, 0], [0, 0, 0, 1, 0],
@@ -42,16 +42,16 @@ solver.solve(model)
 print(f"Minimum Total Cost = ${model.total_cost():,.2f}")
 model.agents_each_shift.pprint()
 
-# model.write('model.lp', io_options={'symbolic_solver_labels': True})
-# #!glpsol -m model.lp --lp --ranges sensit.sen
-# command = "glpsol -m model.lp --lp --ranges sensit.sen"
-# import subprocess
-# subprocess.call(command)
+model.write('model.lp', io_options={'symbolic_solver_labels': True})
+#!glpsol -m model.lp --lp --ranges sensit.sen
+command = "glpsol -m model.lp --lp --ranges sensit.sen"
+import subprocess
+subprocess.call(command)
 
-# import numpy as np
-# # print sensitivity report
-# np.set_printoptions(linewidth=110)
-# f = open('sensit.sen', 'r')
-# file_contents = f.read()
-# print(file_contents)
-# f.close()
+import numpy as np
+# print sensitivity report
+np.set_printoptions(linewidth=110)
+f = open('sensit.sen', 'r')
+file_contents = f.read()
+print(file_contents)
+f.close()

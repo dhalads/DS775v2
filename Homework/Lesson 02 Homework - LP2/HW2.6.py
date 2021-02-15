@@ -3,7 +3,7 @@ max_hours_worked_per_day = dict(zip(lab_days, [14, 14, 14, 14, 14]))
 
 operators = ['KC', 'DH', 'HB', 'SC', 'KS', 'NK']
 operator_wage = dict(zip(operators, [25, 26, 24, 23, 28, 30]))
-operator_min_hours_per_week = dict(zip(operators, [7, 7, 7, 7, 8, 8]))
+operator_min_hours_per_week = dict(zip(operators, [8, 8, 8, 8, 7, 7]))
 
 omhed = [[6,0,6,0,6], [0,6,0,6,0], [4,8,4,0,4], [5,5,5,0,5], [3,0,3,8,0], [0,0,0,6,2]]
 operator_max_hours_each_day = {
@@ -65,15 +65,15 @@ dvars = pd.DataFrame([[model.operator_hours[o, d]() for d in lab_days]
 print("Number of hours each person will work each day:")
 print(dvars)
 
-# model.write('model.lp', io_options={'symbolic_solver_labels': True})
-# command = "glpsol -m model.lp --lp --ranges sensit.sen"
-# import subprocess
-# subprocess.call(command)
+model.write('model.lp', io_options={'symbolic_solver_labels': True})
+command = "glpsol -m model.lp --lp --ranges sensit.sen"
+import subprocess
+subprocess.call(command)
 
-# import numpy as np
-# # print sensitivity report
-# np.set_printoptions(linewidth=110)
-# f = open('sensit.sen', 'r')
-# file_contents = f.read()
-# print(file_contents)
-# f.close()
+import numpy as np
+# print sensitivity report
+np.set_printoptions(linewidth=110)
+f = open('sensit.sen', 'r')
+file_contents = f.read()
+print(file_contents)
+f.close()
