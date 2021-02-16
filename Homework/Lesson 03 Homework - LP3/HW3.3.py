@@ -100,6 +100,10 @@ print(f"Minimum Total Cost = ${model.total_cost():,.2f}")
 
 # # or can setup a data frame for nicer display, use zeros for infeasible routes
 print("\nData Frame display of transported amounts:")
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
+pd.set_option('display.max_colwidth', -1)
 df = pd.DataFrame(columns = ['Product' , 'Start', 'End' , 'Units'])
 for p,f,w in route_cost_FW:
     df = df.append({'Product' : p , 'Start' : f, 'End' : w, "Units" : model.num_shipped_per_route_FW[p, f, w].value } , ignore_index=True)
