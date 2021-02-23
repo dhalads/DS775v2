@@ -21,8 +21,13 @@ def createLinearModels(inputs, lm_outputs):
         model = sm.OLS(Y, X).fit()
         lm_dict.update({out: model})
 
-createLinearModels(inputs, lm_outputs)
+def printlm():
+    for lm in lm_dict.keys():
+        print(f"\nModel for {lm}")
+        print(lm_dict.get(lm).summary())
 
+createLinearModels(inputs, lm_outputs)
+printlm()
 model = ConcreteModel()
 
 model.inputs = Var(inputs,  domain=NonNegativeReals)
