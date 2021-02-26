@@ -10,7 +10,8 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "cwd": "${fileDirname}"
+            "cwd": "${fileDirname}",
+            "env": {"IPOPTWINDIR" : "/Users/djhalama/anaconda3/envs/ds775/Ipopt-3.13.3-win64-msvs2019-md"}
         }
     ]
 }
