@@ -21,7 +21,7 @@ ind_prob = 0.1 # probability each variable in an individual mutates
 num_iter = 1000 # number of genetic algorithm mutations
 update_iter = 100 # how often to display output
 ######
-
+np.random.seed(123)
 stats = np.zeros((num_iter+1,3)) # for collecting statistics
 
 with open("data/Caps48.json", "r") as tsp_data:
@@ -30,6 +30,31 @@ distance_matrix = tsp["DistanceMatrix"]
 optimal_tour = tsp["OptTour"]
 opt_dist = tsp["OptDistance"]/1000 # converted to kilometers
 xy = np.array(tsp["Coordinates"])
+
+def plot_tour(best_tour, xy_meters, best_dist, height, width):
+
+    meters_to_pxl = 0.0004374627441064968
+    intercept_x = 2.464
+    intercept_y = 1342.546
+    xy_pixels = np.zeros(xy_meters.shape)
+    xy_pixels[:,0] = meters_to_pxl * xy_meters[:,0] + intercept_x
+    xy_pixels[:,1] = -meters_to_pxl * xy_meters[:,1] + intercept_y
+
+    fig, ax = plt.subplots(1, 1, figsize=(height, width))
+    im = plt.imread('images/caps48.png')
+    implot = ax.imshow(im)
+    plt.setp(ax.get_xticklabels(), visible=False)
+    plt.setp(ax.get_yticklabels(), visible=False)
+    ax.tick_params(axis='both', which='both', length=0)
+
+    loop_tour = np.append(best_tour, best_tour[0])
+    ax.plot(xy_pixels[loop_tour, 0],
+            xy_pixels[loop_tour, 1],
+            c='b',
+            linewidth=1,
+            linestyle='-')
+    plt.title('Best Distance {:d} km'.format(int(best_dist)))
+    plt.show(block=True)
 
 ######
 # objective or fitness function
@@ -99,11 +124,16 @@ for iter in range(num_iter):
         individual = cx_pop[:,j].copy() # copy is necessary to avoid conflicts in memory
         if np.random.uniform()<mut_prob:
             ###### swap the ith entry with a randomly selected entry with prob ind_prob
-            swap_idx_1 = np.random.randint(48)
-            swap_idx_2 =  np.random.randint(48)
-            swap_value =  individual[swap_idx_1]
-            individual[swap_idx_1] = individual[swap_idx_2]
-            individual[swap_idx_2] = swap_value
+            # For mutation of permutation variables it is common to use Shuffling Indices. To do just make a copy of the individual then loop over each variable and with
+            #  probability ind_prob swap it with another randomly selected variable in the individual. It's possible that you may end up swapping a variable with itself, but that's OK.
+            # To initialize you'll to use a loop since it's only possible to create one random permutation at a time.
+            for i in range(individual.size):
+                if np.random.uniform()<ind_prob:
+                    swap_idx_1 = 1
+                    swap_idx_2 =  np.random.randint(48)
+                    swap_value =  individual[swap_idx_1]
+                    individual[swap_idx_1] = individual[swap_idx_2]
+                    individual[swap_idx_2] = swap_value
             ######
         mut_pop[:,j] = individual.copy() # copy is necessary to avoid conflicts in memory
 
@@ -128,3 +158,4 @@ print(f"The minimum value found of the fitnexx function is {best_fitness/1000:.0
 print("The tour that is minimum is:")
 ######
 print('(',', '.join(f"{x}" for x in best_x),')')
+plot_tour(best_x, xy, best_fitness/1000, 9, 6)
