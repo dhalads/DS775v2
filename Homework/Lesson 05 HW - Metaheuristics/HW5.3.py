@@ -77,16 +77,18 @@ class Rastrigin_b(Annealer):
         self.state = gauss_move(self.state, self.sigma)
         self.state = clip_to_bounds(self.state, self.low, self.high)
         bounds = [(self.low,self.high) for i in range(self.state.size)]
-        result = minimize(f, self.state, bounds=bounds)
+        result = minimize(f, self.state, bounds=bounds, tol=0.1)
         self.state = result.x
 
     def energy(self):
         return f(self.state)
 
-init_state = np.random.uniform(low=0,high=0,size=10)
+init_state = np.random.uniform(low=low,high=high,size=10)
 problem2D = Rastrigin_b( init_state, sigma, low, high )
-problem2D.set_schedule(problem2D.auto(minutes=.6))
+problem2D.set_schedule(problem2D.auto(minutes=.001))
 best_x, best_fun = problem2D.anneal()
+bounds = [(low,high) for i in range(best_x.size)]
+result = minimize(f, best_x, bounds=bounds)
 
 print("Notice that the results below are displayed using scientific notation.\n")
 print(f"The lowest function value found by simulated annealing is {best_fun:.3e}")
