@@ -15,7 +15,7 @@ ind_size = 48 # determines number of input variables for each tour
 tourn_size = 3 # tournament size for selection
 cx_prob = 0.8 # probability a pair of parents crossover to produce two children
 mut_prob = 0.3 # probability an individual mutates
-ind_prob = 0.1 # probability each variable in an individual mutates
+ind_prob = 0.4 # probability each variable in an individual mutates
 #sigma = (upper-lower)/6 # standard deviation (scale) for gaussian mutations
 ###### maybe here
 num_iter = 1000 # number of genetic algorithm mutations

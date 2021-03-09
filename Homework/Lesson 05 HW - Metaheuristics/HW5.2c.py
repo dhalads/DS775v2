@@ -7,18 +7,18 @@ import json
 from simanneal import Annealer
 
 #####
-pop_size = 10 # should be even due to the way we'll implement crossover
+pop_size = 500 # should be even due to the way we'll implement crossover
 ind_size = 20 # determines number of input variables for each tour
 ######
 #lower = -5.12 # lower and upper bounds on the real variables
 #upper = 5.12
 tourn_size = 3 # tournament size for selection
-cx_prob = 0.8 # probability a pair of parents crossover to produce two children
-mut_prob = 0.3 # probability an individual mutates
-ind_prob = 0.1 # probability each variable in an individual mutates
+cx_prob = 0.7 # probability a pair of parents crossover to produce two children
+mut_prob = 0.4 # probability an individual mutates
+ind_prob = 0.2 # probability each variable in an individual mutates
 #sigma = (upper-lower)/6 # standard deviation (scale) for gaussian mutations
 ###### maybe here
-num_iter = 1000 # number of genetic algorithm mutations
+num_iter = 500 # number of genetic algorithm mutations
 update_iter = 100 # how often to display output
 ######
 np.random.seed(123)
@@ -51,7 +51,7 @@ def print_out(label):
     print(f"weight: {weight}")
 
 max_weight = 50
-values, weights, x = create_set1()
+values, weights, xrange = create_set1()
 np.random.seed() # use system clock to reset the seed so future random numbers will appear random
 
 
@@ -68,10 +68,10 @@ def knapsack_value_penalty(x, values, weights, max_tot_weight):
 #initialize population and fitness np.random.randint(0,2,size=20,dtype=bool)
 # init_tour = np.random.permutation(np.arange(len(distance_matrix))).astype(int).tolist()
 # pop = np.random.uniform(low=lower, high=upper, size = (ind_size,pop_size))
-pop = np.zeros((ind_size, pop_size)).astype(int)
+pop = np.zeros((ind_size, pop_size)).astype(bool)
 fitness = np.zeros(pop_size)
 for j in range(pop_size):
-    pop[:,j] = np.random.randint(0,2,ind_size).astype(int)
+    pop[:,j] = np.random.randint(0,2,size=ind_size, dtype=bool)
     fitness[j] = knapsack_value_penalty(pop[:,j], values, weights, max_weight)
 ######
 
@@ -93,7 +93,7 @@ for iter in range(num_iter):
         select_pop[:,j] = pop[:,smallest_pos]
 
     # one-point crossover (mating)
-    cx_pop = np.zeros((ind_size,pop_size)).astype(int) # initialize crossover population
+    cx_pop = np.zeros((ind_size,pop_size)).astype(bool) # initialize crossover population
     for j in range(int(pop_size/2)):  # pop_size must be even
         #######
         parent1, parent2 = select_pop[:,2*j], select_pop[:,2*j+1]
@@ -106,7 +106,7 @@ for iter in range(num_iter):
         ######
 
     # gaussian mutation (rewritten to remove nested loop for speed)
-    mut_pop = np.zeros((ind_size,pop_size)).astype(int) # initialize mutation population
+    mut_pop = np.zeros((ind_size,pop_size)).astype(bool) # initialize mutation population
     for j in range(pop_size):
         individual = cx_pop[:,j].copy() # copy is necessary to avoid conflicts in memory
         if np.random.uniform()<mut_prob:
@@ -116,10 +116,10 @@ for iter in range(num_iter):
             # To initialize you'll to use a loop since it's only possible to create one random permutation at a time.
             for i in range(individual.size):
                 if np.random.uniform()<ind_prob:
-                    if individual[i] == 1 :
-                        individual[i] = 0
+                    if individual[i] == True :
+                        individual[i] = False
                     else:
-                        individual[i] = 1
+                        individual[i] = True
             ######
         mut_pop[:,j] = individual.copy() # copy is necessary to avoid conflicts in memory
 
@@ -144,3 +144,6 @@ print(f"The minimum value found of the fitnexx function is {best_fitness:.0f}")
 print("The tour that is minimum is:")
 ######
 print('(',', '.join(f"{x}" for x in best_x),')')
+x = best_x
+print_set("set 1")
+print_out("set 1")
