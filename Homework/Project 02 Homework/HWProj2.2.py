@@ -41,12 +41,12 @@ X = np.array(X.drop(columns=['status_Bad']))
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.1, random_state=0)
 
-cv_setting = 2
-pop_setting = 2
-gen_setting = 2
+cv_setting = 5
+pop_setting = 5
+gen_setting = 5
 def getParams(x):
     # test
-    params_test = {
+    params = {
         "n_estimators": [10, 60, 100],
         "max_depth": [2, 3, 5],
         "min_child_weight": [1, 10, 20],
@@ -56,7 +56,7 @@ def getParams(x):
         "reg_alpha": [0,3,4]
     }
     # dev
-    params = {
+    params_dev = {
         "n_estimators": [100],
         "max_depth": [3],
         "min_child_weight": [1],
@@ -124,6 +124,7 @@ col_list.append("score")
 col_list.append("accuracy")
 col_list.append("sensitivity")
 col_list.append("precision")
+col_list.append("specificity")
 col_list.append("num_fits")
 m_output = pd.DataFrame(columns=col_list)
 
@@ -142,6 +143,8 @@ def addOutput(method, x, model, fits):
     temp.update({"sensitivity":m_sensitivity })
     m_precision = m_confusion[1][1] /(m_confusion[1][1]+m_confusion[0][1])  # TP/(TP+FP)
     temp.update({"precision":m_precision})
+    m_specificity = m_confusion[0][0] /(m_confusion[0][0]+m_confusion[0][1])  # TP/(TP+FP)
+    temp.update({"specificity":m_specificity})
     temp.update({"num_fits":fits})
     output = m_output.append(temp, ignore_index=True)
     m_output = output
