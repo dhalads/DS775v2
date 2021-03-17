@@ -165,10 +165,10 @@ grid_search = GridSearchCV(rf_model,
                            n_jobs=1,
                            return_train_score=True)
 
-# grid_search.fit(X_train, y_train)
-# my_regression_results(grid_search)
-# addOutput("grid", grid_search.best_params_)
-# display(m_output)
+grid_search.fit(X_train, y_train)
+my_regression_results(grid_search)
+addOutput("grid", grid_search.best_params_, grid_search, 2*get_num_combinations())
+display(m_output)
 
 # from sklearn.model_selection import RandomizedSearchCV
 # from scipy.stats import uniform, randint
