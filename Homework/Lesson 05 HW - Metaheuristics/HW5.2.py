@@ -63,14 +63,14 @@ class KnapsackProblem_a(Annealer):
 max_weight = 50
 np.random.seed() # use system clock to reset the seed so future random numbers will appear random
 
-# values, weights, x = create_set1()
-# x[[(0,2,4)]] = True
-# print_set("prob a")
-# ksp = KnapsackProblem_a(x, values, weights, max_weight)
-# ksp.set_schedule(ksp.auto(minutes=.2)) #set approximate time to find results
+values, weights, x = create_set1()
+x[[(0,2,4)]] = True
+print_set("prob a")
+ksp = KnapsackProblem_a(x, values, weights, max_weight)
+ksp.set_schedule(ksp.auto(minutes=.2)) #set approximate time to find results
 
-# x, value = ksp.anneal()
-# print_out(f"prob a")
+x, value = ksp.anneal()
+print_out(f"prob a")
 
 class KnapsackProblem_b(Annealer):
 
