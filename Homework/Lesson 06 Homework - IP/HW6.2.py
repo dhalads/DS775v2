@@ -12,23 +12,25 @@ product_startup_cost = dict(zip(products, [50000,40000,70000,60000]))
 plants = ['1','2']
 tpu = [ [5, 3, 6, 4], [4, 6, 3, 5] ]
 time_per_unit = {
-    plants[p]: dict(zip(, tpu[p][:]))
+    plants[p]: dict(zip(products, tpu[p][:]))
     for p in range(len(plants))
 }
+
 production_avail = dict(zip(plants, [ 6000, 6000]))
 
 binCon = ['1', '2', '3']
 
 ycoef = [ [1, 1, 1, 1], [-1,-1,1,0] , [-1,-1,0,1]]
-coef_per_cst = {
-    binCon[bc]: dict(zip(, ycoef[bc][:]))
+coef_per_prd = {
+    products[bc]: dict(zip(products, ycoef[bc][:]))
     for bc in range(len(binCon))
 }
-ycoeflimit = dict(zip(intCon, [2, 0, 0]))
+ycoeflimit = dict(zip(binCon, [2, 0, 0]))
 
 bigM = 100000
 
-max_num_products_to_make = 1
+max_num_products_to_make = 2
+max_num_plants = 1
 
 # Instantiate concrete model
 M = ConcreteModel(name="Example_1")
@@ -50,8 +52,8 @@ M.constraints = ConstraintList()
 for pr in products:  # produce product only if product is chosen
     M.constraints.add(M.x[pr] <= bigM * M.y[pr])
 
-# choose 2 products
-M.constraints.add(sum(M.y[pr] for pr in products) <= max_num_products_to_make)
+# choose only one plant
+M.constraints.add(sum(M.plant_choice[pl] for pl in plants) <= max_num_plants)
 
 for pl in plants:  # production capacities
     M.constraints.add(
@@ -60,8 +62,8 @@ for pl in plants:  # production capacities
 
 for bc in binCon:  # production capacities
     M.constraints.add(
-        sum(time_per_unit[bc][ycoef] * M.y[pr]
-            for pr in products) <= production_avail[pl] + bigM*M.plant_choice[pl])
+        sum(coef_per_prd[bc][pr] * M.y[pr]
+            for pr in products) <= ycoeflimit[bc])
 
 M.constraints.pprint()
 
@@ -71,9 +73,9 @@ solver.solve(M)
 
 print(f"\nMaximum Profit = ${1000 * M.profit():,.2f}")
 
-# print("\nWhich plant to use:")
-# for pl in plants:
-#     print(f"Produce at {pl}? {['No','Yes'][int(M.plant_choice[pl]())]}")
+print("\nWhich plant to use:")
+for pl in plants:
+    print(f"Produce at {pl}? {['No','Yes'][int(M.plant_choice[pl]())]}")
 
 print("\nWhich products and how many:")
 for pr in products:
