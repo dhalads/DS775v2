@@ -21,23 +21,28 @@ from IPython.core.display import HTML
 
 # problem data
 
-course = ['1', '2', '3', '4']
+courses = ['1', '2', '3', '4']
 
-study_days = [1, 2, 3, 4]
+study_days = [1,2,3,4]
 gps = [ [3,5,6,7], [5,5,6,9], [2,4,7,8], [6,7,9,9] ]
 # cost_per_unit = {
 #     plants[p]: dict(zip(dist, cpu[p][:]))
 #     for p in range(len(plants))
 # }
 
-num_courses = len(course)
+num_courses = len(courses)
 num_study_days = len(study_days)
 # Create the model.
 model = cp_model.CpModel()
 
 # Variables
+# assign = [
+#     model.NewIntVarFromDomain(cp_model.Domain.FromValues(study_days), f'courses{c}')
+#     for c in range(num_courses)
+# ]
+
 assign = [
-    model.NewIntVarFromDomain(cp_model.Domain.FromValues(study_days), f'x{c}')
+    model.NewIntVar(0, num_study_days - 1, courses[c])
     for c in range(num_courses)
 ]
 
@@ -53,20 +58,23 @@ for c in range(num_courses):
 
 model.Maximize(sum(points))
 
-model.Add(sum(assign[c] for c in range(num_courses))==7)
+model.Add(sum(assign[c] for c in range(num_courses))==6)
 
 for c in range(num_courses):
-    model.Add(assign[c] >= 1)
+    model.Add(assign[c] >= 0)
 
 # Creates a solver and solves the model.
 solver = cp_model.CpSolver()
 status = solver.Solve(model)
 # tmp = cp_model.INFEASIBLE
+
+for c in range(num_courses):
+    print(f"course {c+1} study {solver.Value(assign[c])} days to {solver.Value(points[c])} points.")
 if status == cp_model.OPTIMAL:
     print(f'Lowest Possible Cost: {solver.ObjectiveValue()}')
     print()
     print('Assignments and associated costs:')
-    cost_assigns = pd.DataFrame(0, index=course, columns=study_days)
+    cost_assigns = pd.DataFrame(0, index=courses, columns=study_days)
     for i in range(num_courses):
         cost_assigns.iloc[i, solver.Value(assign[i])] = solver.Value(points[i])
     display(cost_assigns)
