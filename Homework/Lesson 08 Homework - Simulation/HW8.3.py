@@ -14,6 +14,8 @@ import statistics as st
 # display imports
 from IPython.display import display, IFrame
 from IPython.core.display import HTML
+from scipy.optimize import minimize
+from sklearn.linear_model import LogisticRegression
 
 # helper function for nicely printing dollar amounts
 def dollar_print(x):
@@ -71,7 +73,7 @@ def runProblem3():
     plt.ylabel('profit(millions)')
     plt.show()
 
-runProblem3()
+# runProblem3()
 
 # plt.figure(figsize = (8,5))
 # # display Winnings in a histogram
@@ -92,3 +94,11 @@ runProblem3()
 # num40k = sum([1 for i in results if i>=40000])
 # print(f"The probability >= $35,000  {num35k/len(results)}")
 # print(f"The probability >= $40,000  {num40k/len(results)}")
+
+def runProblem4(x):
+    numWin, probWin, meanProfit = bidAnalysis(x)
+    return (-meanProfit)
+
+result = minimize( runProblem4, 6, bounds = [(5,7)])
+print(f"There is a local maximum value of x = {result.x[0]:1.2f}")
+print(f"There is a local maximum value of {-result.fun:3.2f}")
