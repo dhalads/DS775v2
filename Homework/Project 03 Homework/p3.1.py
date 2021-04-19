@@ -17,36 +17,8 @@ import urllib.request
 from IPython.display import display, IFrame
 from IPython.core.display import HTML
 
-def run_schedule():
+def run_schedule(task_duration_dict, isShow=False):
     # generalizable schedule code
-
-    task_info_dict = {
-        'A': ("Evacuate", 7, 14, 21, []),
-        'B': ("Lay Foundation", 14, 21, 56, ['A']),
-        'C': ("Evacuate", 42, 63, 126, []),
-        'D': ("Evacuate", 28, 35, 70, []),
-        'E': ("Evacuate", 7, 28, 35, []),
-        'F': ("Evacuate", 28, 35, 70, []),
-        'G': ("Evacuate", 35, 42, 77, []),
-        'H': ("Evacuate", 35, 56, 119, []),
-        'I': ("Evacuate", 21, 49, 63, []),
-        'J': ("Evacuate", 21, 63, 63, []),
-        'K': ("Evacuate", 21, 28, 28, []),
-        'L': ("Evacuate", 7, 35, 49, []),
-        'M': ("Evacuate", 7, 14, 21, []),
-        'N': ("Evacuate", 35, 35, 63, [])
-    }
-
-    def get_task_duration():
-        output = {}
-        for task in task_info_dict.keys():
-            task_info = task_info_dict.get(task)
-            duration = np.random.triangular(left=task_info[1], mode=task_info[2], right=task_info[3], size=1)
-            duration_int = np.rint(duration).astype(int)
-            output[task] =  duration_int[0].item()
-        return(output)
-
-    task_duration_dict = get_task_duration()
 
     # task_duration_dict2 = {
     #     'A': 2,
@@ -71,6 +43,7 @@ def run_schedule():
     # for each task we have a list of tasks that must go after
     # task:['these','tasks','after']
     precedence_dict = {
+        'A': ['Art'],
         'B': ['A'],
         'C': ['B'],
         'D': ['C'],
@@ -118,62 +91,97 @@ def run_schedule():
 
     solver = cp_model.CpSolver()
     status = solver.Solve(model)
+    if isShow :
+        print(f'Optimal Schedule Length: {solver.ObjectiveValue()}')
+        for i in range(num_tasks):
+            print(
+                f'{task_names[i]} start at {solver.Value(start_vars[i])} and end at {solver.Value(end_vars[i])}'
+            )
 
-    print(f'Optimal Schedule Length: {solver.ObjectiveValue()}')
-    for i in range(num_tasks):
-        print(
-            f'{task_names[i]} start at {solver.Value(start_vars[i])} and end at {solver.Value(end_vars[i])}'
-        )
+        # output_notebook()
 
-    # # output_notebook()
+        starts = [solver.Value(start_vars[i]) for i in range(num_tasks)]
+        ends = [solver.Value(end_vars[i]) for i in range(num_tasks)]
 
-    # starts = [solver.Value(start_vars[i]) for i in range(num_tasks)]
-    # ends = [solver.Value(end_vars[i]) for i in range(num_tasks)]
+        source = ColumnDataSource(data=dict(tasks=task_names, starts = starts, ends=ends))
 
-    # source = ColumnDataSource(data=dict(tasks=task_names, starts = starts, ends=ends))
+        p = figure(x_range=(0,solver.ObjectiveValue()), y_range=task_names, plot_height=350, title="Task Time Spans",
+                toolbar_location=None, tools="")
 
-    # p = figure(x_range=(0,solver.ObjectiveValue()), y_range=task_names, plot_height=350, title="Task Time Spans",
-    #         toolbar_location=None, tools="")
+        p.hbar(y='tasks', left='starts', right='ends', height=0.9, source=source)
 
-    # p.hbar(y='tasks', left='starts', right='ends', height=0.9, source=source)
+        p.xaxis.axis_label = "Time"
+        p.ygrid.grid_line_color = None
 
-    # p.xaxis.axis_label = "Time"
-    # p.ygrid.grid_line_color = None
+        show(p)
 
-    # show(p)
-    days = solver.ObjectiveValue()
+    output = solver.ObjectiveValue()
+    return output
+    # end method run_schedule
+
+def generate_task_durations(isArtifacts):
+    task_info_dict = {
+        'A': ("Evacuate", 7, 14, 21, []),
+        'Art': ("Artifact", 0, 0, 0, []),
+        'B': ("Lay Foundation", 14, 21, 56, ['A']),
+        'C': ("Evacuate", 42, 63, 126, []),
+        'D': ("Evacuate", 28, 35, 70, []),
+        'E': ("Evacuate", 7, 28, 35, []),
+        'F': ("Evacuate", 28, 35, 70, []),
+        'G': ("Evacuate", 35, 42, 77, []),
+        'H': ("Evacuate", 35, 56, 119, []),
+        'I': ("Evacuate", 21, 49, 63, []),
+        'J': ("Evacuate", 21, 63, 63, []),
+        'K': ("Evacuate", 21, 28, 28, []),
+        'L': ("Evacuate", 7, 35, 49, []),
+        'M': ("Evacuate", 7, 14, 21, []),
+        'N': ("Evacuate", 35, 35, 63, [])
+    }
+    if isArtifacts :
+        task_info_dict.update({'Art':("Evacuate", 7, 15, 365, [] )})
+    pass
+    output = {}
+    for task in task_info_dict.keys():
+        task_info = task_info_dict.get(task)
+        if task_info[1]==task_info[3] :
+            duration = 0
+        else :
+            duration = np.random.triangular(left=task_info[1], mode=task_info[2], right=task_info[3], size=1)
+            duration_int = np.rint(duration).astype(int)
+            duration = duration_int[0].item()
+        output[task] = duration
+
+    return(output)
+
+def print_prob_profit(sims, low, high, isArtifacts):
+    n = len(sims)
+    subset = [i for i in sims if i>=low and i<=high]
+    prob = len(subset)/n
+    if len(subset)==0 :
+        avg_profit = 0
+    else:
+        avg_profit = sum([calc_profit(i,isArtifacts) for i in subset])/len(subset)
+    print(f"Days from {low} to {high}: prob is {prob}, average profit is {avg_profit:.3f} ")
+
+def calc_profit(days, isArtifacts):
     profit = 5.4
     if days <= 280:
         profit = profit + 0.150
     elif days > 329 :
         overdays = days - 329
         profit = profit - 0.025*overdays
+    if isArtifacts:
+        extraCost = np.random.exponential( scale=0.1)
+        profit = profit - extraCost
+    return profit
 
-    output = (days, profit)
-    return(output)
-    # end method run_schedule
-
-def print_prob_profit(sims, low, high):
-    n = len(sims)
-    subset = [i for i in sims if i[0]>=low and i[0]<=high]
-    prob = len(subset)/n
-    if len(subset)==0 :
-        avg_profit = 0
-    else:
-        avg_profit = sum([i[1] for i in subset])/len(subset)
-    print(f"Days from {low} to {high}: prob is {prob}, average profit is {avg_profit} ")
-
-def run_simulations(num_sim, isArtifacts):
-    days = []
-    profits = []
+def run_simulations(num_sim, isArtifacts, isShow):
     sims = []
     for i in range(num_sim):
-        output = run_schedule()
-        days.append(output[0])
-        profits.append(output[1])
+        output = run_schedule(generate_task_durations(isArtifacts), isShow)
         sims.append(output)
-    print_prob_profit(sims, 0, 280)
-    print_prob_profit(sims, 281, 328)
-    print_prob_profit(sims, 330, 1000)
+    print_prob_profit(sims, 0, 280, isArtifacts)
+    print_prob_profit(sims, 281, 328, isArtifacts)
+    print_prob_profit(sims, 330, 1000, isArtifacts)
 
-run_simulations(10, False)
+run_simulations(100, True, False)
