@@ -184,4 +184,4 @@ def run_simulations(num_sim, isArtifacts, isShow):
     print_prob_profit(sims, 281, 328, isArtifacts)
     print_prob_profit(sims, 330, 1000, isArtifacts)
 
-run_simulations(100, True, False)
+run_simulations(1000, True, False)
