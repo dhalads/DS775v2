@@ -4,5 +4,7 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"python.pythonPath": "C:\\Users\\djhalama\\anaconda3\\envs\\ds775\\python.exe"
+	}
 }

@@ -123,19 +123,19 @@ def generate_task_durations(isArtifacts):
     task_info_dict = {
         'A': ("Evacuate", 7, 14, 21, []),
         'Art': ("Artifact", 0, 0, 0, []),
-        'B': ("Lay Foundation", 14, 21, 56, ['A']),
-        'C': ("Evacuate", 42, 63, 126, []),
-        'D': ("Evacuate", 28, 35, 70, []),
-        'E': ("Evacuate", 7, 28, 35, []),
-        'F': ("Evacuate", 28, 35, 70, []),
-        'G': ("Evacuate", 35, 42, 77, []),
-        'H': ("Evacuate", 35, 56, 119, []),
-        'I': ("Evacuate", 21, 49, 63, []),
-        'J': ("Evacuate", 21, 63, 63, []),
-        'K': ("Evacuate", 21, 28, 28, []),
-        'L': ("Evacuate", 7, 35, 49, []),
-        'M': ("Evacuate", 7, 14, 21, []),
-        'N': ("Evacuate", 35, 35, 63, [])
+        'B': ("Lay Foundation", 14, 21, 56, []),
+        'C': ("Put Up Rough Wall", 42, 63, 126, []),
+        'D': ("Put up roof", 28, 35, 70, []),
+        'E': ("Exterior Plumbing", 7, 28, 35, []),
+        'F': ("Interior Plumbing", 28, 35, 70, []),
+        'G': ("Exterior Siding", 35, 42, 77, []),
+        'H': ("Exterior Painting", 35, 56, 119, []),
+        'I': ("Electrical", 21, 49, 63, []),
+        'J': ("Wallboard", 21, 63, 63, []),
+        'K': ("Flooring", 21, 28, 28, []),
+        'L': ("Interior Painting", 7, 35, 49, []),
+        'M': ("Exterior Fixtures", 7, 14, 21, []),
+        'N': ("Interior Fixtures", 35, 35, 63, [])
     }
     if isArtifacts :
         task_info_dict.update({'Art':("Evacuate", 7, 15, 365, [] )})
