@@ -94,8 +94,8 @@ selected2 = 'Comedy'
 
 #instead of creating stand-alone filters, we'll filter "on the fly" using the apply right in the filter
 #again, pay attention to where the parentheses go
-snip[(snip['vote_count'] > 5000) | 
-     ((snip['genres'].apply(lambda x: selected1 in x)) & 
+snip[(snip['vote_count'] > 5000) |
+     ((snip['genres'].apply(lambda x: selected1 in x)) &
       (snip['genres'].apply(lambda x: selected2 in x)))]
 
 #in steps
@@ -189,7 +189,7 @@ def build_chart(gen_df, percentile=0.8):
     
     #Only consider movies that have higher than m votes. Save this in a new dataframe q_movies
     q_movies = movies.copy().loc[movies['vote_count'] >= m]
-    
+
     #Calculate score using the IMDB formula
     q_movies['score'] = q_movies.apply(lambda x: (x['vote_count']/(x['vote_count']+m) * x['vote_average'])
                                        + (m/(m+x['vote_count']) * C)
