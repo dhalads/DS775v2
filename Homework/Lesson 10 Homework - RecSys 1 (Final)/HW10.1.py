@@ -1,5 +1,3 @@
-# EXECUTE FIRST
-
 # computational imports
 import numpy as np
 import pandas as pd
@@ -121,10 +119,15 @@ def approachC(df):
     return((m, C, df))
 
 # uniqueCompanies(df)
-print()
-printOut('A', approachA(df))
-print()
-printOut('B', approachB(df))
-print()
-printOut('C', approachC(df))
+print(id(df))
+print(df.shape)
+printOut('A', approachA(df.copy()))
+print(id(df))
+print(df.shape)
+printOut('B', approachB(df.copy()))
+print(id(df))
+print(df.shape)
+printOut('C', approachC(df.copy()))
+print(id(df))
+print(df.shape)
 

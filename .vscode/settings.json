@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\djhalama\\anaconda3\\envs\\ds775\\python.exe",
+    "python.pythonPath": "C:\\Users\\djhalama\\anaconda3\\envs\\pycaret\\python.exe",
     "python.autoComplete.extraPaths": ["C:\\Users\\djhalama\\anaconda3\\envs\\ds775\\Lib\\site-packages"]
 }
