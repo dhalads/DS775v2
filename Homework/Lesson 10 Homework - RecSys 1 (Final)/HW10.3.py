@@ -52,58 +52,14 @@ def create_soup(x):
 #create a column with the soup in it    
 df['soup'] = df.apply(create_soup, axis=1)
 
-
-print(f'The soup for Toy Story is: \n{df["soup"][0]}')
-
-
-#Apply the generate_list function to cast and keywords
-# df['cast'] = df['cast'].apply(generate_list)
-# df['keywords'] = df['keywords'].apply(generate_list)
-#Only consider a maximum of 3 genres
-# df['genres'] = df['genres'].apply(lambda x: x[:3])
-
-#Import TfIdfVectorizer from the scikit-learn library
-# from sklearn.feature_extraction.text import TfidfVectorizer
-
 vectorizer = CountVectorizer(stop_words='english')
 vectorizer_matrix = vectorizer.fit_transform(df['soup'])
 print(vectorizer_matrix.shape)
-
-# #this extracts all the words (features) in the matrix - we'll use this for our columns
-# feature_names = tfidf.get_feature_names()
-# #this extracts the IDs of the movies - we'll use this for our rows
-# corpus_index = snip['id']
-# #this puts both into a dataframe.
-# #The tfidf_matrix is usually a sparse matrix, meaning not all row/col combinations have a value. Using todense() puts a zero in that row/col slot
-
-# pd.DataFrame(tfidf_matrix.todense(), index=corpus_index, columns=feature_names)
-
-# Import linear_kernel to compute the dot product
-# from sklearn.metrics.pairwise import linear_kernel
-
 # Compute the cosine similarity matrix
 cosine_sim = linear_kernel(vectorizer_matrix, vectorizer_matrix)
-
-#let's look at what we've got.
-display(pd.DataFrame(cosine_sim, columns=df['title'], index=df['title']))
-
 #create the reverse mapping
 indices = pd.Series(df.index, index=df['title']).drop_duplicates()
-#print it 
-print(f'The index series looks like this: \n{indices}')
 
-#if I wanted to get the index from the title I would do this:
-print(f'The index for Waiting to Exhale is: {indices["Halloween"]}')
-print(cosine_sim[2])
-sim_scores = list(enumerate(cosine_sim[2]))
-print(sim_scores)
-sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-print(sim_scores)
-
-top_two = [i[0] for i in sim_scores[0:2]]
-print(f'The top two indices are: {top_two}')
-
-display(df.iloc[top_two])
 
 def content_recommender(df, title, cosine_sim, indices, topN=2):
     # Obtain the index of the movie that matches the title
@@ -124,6 +80,9 @@ def content_recommender(df, title, cosine_sim, indices, topN=2):
     
     # Return the top 10 most similar movies
     return df[['title', 'genres']].iloc[movie_indices]
+
+
+print(f'The soup for first entry is: \n{df["soup"][0]}')
 
 out_recommendation = content_recommender(df, 'Halloween', cosine_sim, indices, 10)
 display(out_recommendation)
