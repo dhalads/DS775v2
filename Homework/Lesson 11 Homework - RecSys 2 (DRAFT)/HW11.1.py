@@ -65,7 +65,7 @@ def score(cf_model, X_test, *args):
     return mean_squared_error(y_true, y_pred, squared=False)
 
 #let's test it with our baseline model
-print(f"baseline score = {score(baseline, X_test)}")
+print(f"baseline RMSE score = {score(baseline, X_test)}")
 
 
 #Build the ratings matrix using pivot_table function
@@ -74,7 +74,7 @@ r_matrix = X_train.pivot_table(values='rating', index='userID', columns='placeID
 print(r_matrix.head())
 
 #Create a dummy ratings matrix with all null values imputed to 0
-r_matrix_dummy = r_matrix.copy().fillna(0)
+r_matrix_dummy = r_matrix.copy().fillna(1)
 # Import cosine_score
 # from sklearn.metrics.pairwise import cosine_similarity
 
@@ -91,7 +91,7 @@ def cf_user_wmean(user_id, place_id, ratings_matrix, c_sim_matrix):
 
     #Check if movie_id exists in r_matrix
     if place_id in ratings_matrix:
-        
+
         #Get the similarity scores for the user in question with every other user
         sim_scores = c_sim_matrix[user_id]
 
@@ -103,7 +103,7 @@ def cf_user_wmean(user_id, place_id, ratings_matrix, c_sim_matrix):
 
         #Drop the NaN values from the m_ratings Series
         m_ratings = m_ratings.dropna()
-        
+
         #Drop the corresponding cosine scores from the sim_scores series
         sim_scores = sim_scores.drop(idx)
 
@@ -118,6 +118,6 @@ def cf_user_wmean(user_id, place_id, ratings_matrix, c_sim_matrix):
 
 
 
-print(f"Weighted Mean score = {score(cf_user_wmean, X_test, r_matrix_dummy, cosine_sim)}")
+print(f"Weighted Mean RMSE score = {score(cf_user_wmean, X_test, r_matrix_dummy, cosine_sim)}")
 
 
