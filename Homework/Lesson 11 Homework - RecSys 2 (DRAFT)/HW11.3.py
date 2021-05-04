@@ -56,5 +56,8 @@ for i in nums:
     knn_RMSE = np.mean(knn_cv['test_rmse'])
     ss.append(knn_RMSE)
  #Plot the Elbow Plot of SS v/s K
-sns.pointplot(x=[j for j in nums], y=ss)
+plot = sns.pointplot(x=[j for j in nums], y=ss)
+
+
+
 

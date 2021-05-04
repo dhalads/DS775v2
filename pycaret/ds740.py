@@ -59,3 +59,7 @@ print(f"The shape is {df.shape}")
 
 from pycaret.classification import *
 clf1 = setup(df, target = 'overall_survival', imputation_type='iterative', session_id=123, log_experiment=True, experiment_name='exp1',fix_imbalance=True)
+
+best_model = compare_models()
+
+display(best_model)

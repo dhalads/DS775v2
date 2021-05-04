@@ -49,7 +49,7 @@ df['overview'] = df['overview'].fillna('')
 def create_soup(x):
     return ' '.join(x['genres']) + ' ' + ' '.join(x['keywords']) + ' ' + ' '.join(x['production_companies']) + ' ' + x['overview']
 
-#create a column with the soup in it    
+#create a column with the soup in it
 df['soup'] = df.apply(create_soup, axis=1)
 
 vectorizer = CountVectorizer(stop_words='english')
@@ -68,16 +68,16 @@ def content_recommender(df, title, cosine_sim, indices, topN=2):
     sim_scores = list(enumerate(cosine_sim[idx]))
     #delete the movie that was passed in
     del sim_scores[idx]
-    
+
     # Sort the movies based on the cosine similarity scores
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    
+
     # Get the scores of the top-n most similar movies.
     sim_scores = sim_scores[:topN]
-    
+
     # Get the movie indices
     movie_indices = [i[0] for i in sim_scores]
-    
+
     # Return the top 10 most similar movies
     return df[['title', 'genres']].iloc[movie_indices]
 
