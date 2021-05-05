@@ -32,10 +32,10 @@ import os
 df = pd.read_csv('data/restaurant/rating_final.csv')
 df['rating'] = df['rating'] + df['food_rating'] + df['service_rating'] + 1
 df = df.drop(columns=["food_rating", "service_rating"])
-df.info()
-print(df.describe())
-print(df.shape)
-print(df.head())
+# df.info()
+# print(df.describe())
+# print(df.shape)
+# print(df.head())
 
 X = df.copy()
 y = df['userID']
@@ -43,23 +43,23 @@ y = df['userID']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, stratify=None, random_state=42)
 
 #first determine the median of our ratings (we could have done this by hand, but numpy does it so well... )
-print(f"The median of this rating range is {np.median(df['rating'])}")
+print(f"The median of rating is {np.median(df['rating'])}")
 
 #define a baseline model to always return the median
 def baseline(user_id, place_id, *args):
     return 5.0
 
 #Function to compute the RMSE score obtained on the testing set by a model
-def score(cf_model, X_test, *args):
+def score(cf_model, data, *args):
 
     #Construct a list of user-place tuples from the testing dataset
-    id_pairs = zip(X_test['userID'], X_test['placeID'])
+    id_pairs = zip(data['userID'], data['placeID'])
 
     #Predict the rating for every user-movie tuple
     y_pred = np.array([cf_model(user, place, *args) for (user, place) in id_pairs])
 
     #Extract the actual ratings given by the users in the test data
-    y_true = np.array(X_test['rating'])
+    y_true = np.array(data['rating'])
 
     #Return the final RMSE score
     return mean_squared_error(y_true, y_pred, squared=False)
@@ -74,7 +74,7 @@ r_matrix = X_train.pivot_table(values='rating', index='userID', columns='placeID
 print(r_matrix.head())
 
 #Create a dummy ratings matrix with all null values imputed to 0
-r_matrix_dummy = r_matrix.copy().fillna(1)
+r_matrix_dummy = r_matrix.copy().fillna(0)
 # Import cosine_score
 # from sklearn.metrics.pairwise import cosine_similarity
 
@@ -108,10 +108,13 @@ def cf_user_wmean(user_id, place_id, ratings_matrix, c_sim_matrix):
         sim_scores = sim_scores.drop(idx)
 
         #Compute the final weighted mean
-        wmean_rating = np.dot(sim_scores, m_ratings)/ sim_scores.sum()
+        if sim_scores.sum()>0:
+            wmean_rating = np.dot(sim_scores, m_ratings)/ sim_scores.sum()
+        else:  # user had zero cosine similarity with other users
+            wmean_rating = 5.0
 
     else:
-        #Default to a rating of 3.0 in the absence of any information
+        #Default to a rating of 5.0 in the absence of any information
         wmean_rating = 5.0
 
     return wmean_rating
